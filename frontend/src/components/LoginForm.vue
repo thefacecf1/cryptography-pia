@@ -4,7 +4,7 @@ type FormValue = boolean | null
 interface Emits {
   (e: 'login'): void
   (e: 'register'): void
-  (e: 'update:email', email: string): void
+  (e: 'update:username', username: string): void
   (e: 'update:form', form: FormValue): void
   (e: 'update:password', password: string): void
 }
@@ -12,7 +12,7 @@ interface Emits {
 const emits = defineEmits<Emits>()
 const props = defineProps<{
   form: boolean | null
-  email: string | null
+  username: string | null
   password: string | null
 }>()
 
@@ -22,7 +22,7 @@ const emitLogin = () => emits('login')
 const emitRegister = () => emits('register')
 
 const emitForm = (form: FormValue) => emits('update:form', form)
-const emitEmail = (email: string) => emits('update:email', email)
+const emitUsername = (username: string) => emits('update:username', username)
 const emitPassword = (password: string) => emits('update:password', password)
 </script>
 <template>
@@ -33,12 +33,12 @@ const emitPassword = (password: string) => emits('update:password', password)
   >
     <VTextField
       class="mb-2"
-      type="email"
+      type="text"
       variant="outlined"
-      placeholder="Email"
-      :value="props.email"
+      placeholder="Username"
+      :value="props.username"
       :rules="defaultRules"
-      @input="emitEmail($event.target.value)"
+      @input="emitUsername($event.target.value)"
     />
     <VTextField
       class="mb-2"

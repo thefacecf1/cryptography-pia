@@ -24,6 +24,10 @@ def register_user():
     if not isinstance(username, str) or not isinstance(password, str):
         return {"error": True, "message": "invalid values"}, 500
 
+    user = querys.select_user(cursor, username)
+    if user:
+        return {"error": True, "message": "user already exists"}, 403
+
     eliptic_keys.register(username, password)
     querys.insert_users(cursor, username, password)
 
@@ -42,13 +46,14 @@ def create_user():
         return {"error": True, "message": "invalid values"}, 500
 
     user = querys.select_user(cursor, username)
-    if not user:
-        return {"login": False, "register": False}
 
-    isLoginWidthPassword = password != user[0][2]
+    if not user:
+        return {"login": False, "register": False}, 404
+
+    isLoginWidthPassword = password == user[0][2]
     isLoginWidthKeys = eliptic_keys.login(username, password)
 
-    if isLoginWidthPassword and isLoginWidthKeys:
-        return {"login": False, "register": True}
+    if not isLoginWidthPassword or not isLoginWidthKeys:
+        return {"login": False, "register": True}, 401
 
-    return {"login": True, "register": True}
+    return {"login": True, "register": True}, 200

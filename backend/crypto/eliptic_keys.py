@@ -52,7 +52,6 @@ def register(username: str, password: str):
     filenameKey = "keys/{}.key".format(username)
     filenameCer = "keys/{}.cer".format(username)
     write(encrypt(seed, password.encode("utf-8")), filenameKey)
-    print(signed)
     write(signed, filenameCer)
 
 def login(username:str, password: str):
@@ -60,9 +59,7 @@ def login(username:str, password: str):
     filenameCer = "keys/{}.cer".format(username)
     seed: bytes = decrypt(read(filenameKey), password.encode("utf-8"))
     signed_raw: bytes = read(filenameCer)
-    print(signed_raw)
     verify_key = SigningKey(seed).verify_key
-    print(verify_key._key)
     try:
         verify_key.verify(signed_raw)
         return True
