@@ -1,22 +1,27 @@
+import time
 import psycopg2
+
 
 def connect():
     uri = "host=postgres dbname=postgres user=postgres password=postgres"
-    return psycopg2.connect(uri)
+    try:
+        return psycopg2.connect(uri)
+    except:
+        return None
 
 
 def connect_db():
     connection = None
 
     for i in range(10):
-        try:
-            connection = connect()
+        res = connect()
+        if res is not None:
+            connection = res
             break
-        except:
-            print(i)
-            pass
+        time.sleep(2)
 
     return connection
+
 
 def select_users(cursor):
     query = "SELECT * FROM accounts"
@@ -31,5 +36,7 @@ def select_user(cursor, username: str):
 
 
 def insert_users(cursor, username: str, password: str):
-    query = "INSERT INTO accounts (username,password) VALUES ('{}', '{}')".format(username, password)
+    query = "INSERT INTO accounts (username,password) VALUES ('{}', '{}')".format(
+        username, password
+    )
     cursor.execute(query)
