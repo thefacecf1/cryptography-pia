@@ -290,3 +290,4 @@ dist
 .pnp.*
 
 data
+./backend/keys/*
