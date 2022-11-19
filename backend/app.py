@@ -1,3 +1,4 @@
+import psycopg2
 from flask import Flask
 from flask_cors import CORS
 from crypto.keys import (
@@ -11,9 +12,18 @@ app = Flask(__name__)
 CORS(app)
 
 
+def connect():
+    uri = "host=postgres dbname=postgres user=postgres password=postgres"
+    conn = psycopg2.connect(uri)
+    cursor = conn.cursor()
+    cursor.execute("SELECT NOW()")
+    res = cursor.fetchone()
+    return str(res[0]) if res else "No response"
+
+
 @app.get("/")
 def hello_world():
-    return "Hello world from Backend"
+    return connect()
 
 
 @app.get("/keygen")

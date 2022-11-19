@@ -13,8 +13,8 @@ services:
       - ./backend:/usr/src/app/backend
     ports:
       - 5000:5000
-    depends_on: 
-      - postgres
+    networks:
+      - new_network
 
   postgres:
     image: postgres:alpine
@@ -22,7 +22,11 @@ services:
       - 5432:5432
     volumes:
       - ./data/:/var/lib/postgresql/data/
+    networks:
+      - new_network
     environment:
       - POSTGRES_DB=postgres
       - POSTGRES_USER=postgres
       - POSTGRES_PASSWORD=postgres
+networks:
+  new_network: 
