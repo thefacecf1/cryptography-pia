@@ -16,10 +16,7 @@ const showSnackbar = () => (snackbar.value = true)
 const onLogin = async () => {
   if (form.value && username.value && password.value) {
     const res = await fetchLogin(username.value, password.value)
-    const json = await res.json()
-    console.log(json)
     openLoginSnackbar(res.status)
-
   }
 }
 const onRegister = async () => {
