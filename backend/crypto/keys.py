@@ -16,12 +16,12 @@ from cryptography.hazmat.primitives.serialization import (
 )
 
 
-class KeyGenEd25519(TypedDict):
+class KeyGenRSA(TypedDict):
     private_key: bytes
     public_key: bytes
 
 
-def key_gen_ed25519() -> KeyGenEd25519:
+def key_gen_RSA() -> KeyGenRSA:
     private_key = generate_private_key(65537, 2048)
     public_key = private_key.public_key()
 
