@@ -1,9 +1,22 @@
 import psycopg2
 
-def connect_db():
+def connect():
     uri = "host=postgres dbname=postgres user=postgres password=postgres"
-    conn = psycopg2.connect(uri)
-    return conn.cursor()
+    return psycopg2.connect(uri)
+
+
+def connect_db():
+    connection = None
+
+    for i in range(10):
+        try:
+            connection = connect()
+            break
+        except:
+            print(i)
+            pass
+
+    return connection
 
 def select_users(cursor):
     query = "SELECT * FROM accounts"
