@@ -1,56 +1,54 @@
-import query
-import psycopg2
-from crypto import eliptic
-from crypto import keys
+from db import querys
 from flask_cors import CORS
+from crypto import eliptic_keys
 from flask import Flask, request
-
 
 app = Flask(__name__)
 CORS(app)
-
-uri = "host=postgres dbname=postgres user=postgres password=postgres"
-conn = psycopg2.connect(uri)
-cursor = conn.cursor()
+cursor = querys.connect_db()
 
 
 @app.get("/users")
 def get_user():
-    users = query.select_users(cursor)
-    return {"users": users}
+    return {"users": querys.select_users(cursor)}
 
 
 @app.post("/register")
 def register_user():
+    if not isinstance(request.json, dict):
+        return {"error": True, "message": "invalid json format"}, 500
+
     username = request.json.get("username")
     password = request.json.get("password")
-    eliptic.register(username, password)
-    query.insert_users(cursor, username, password)
-    return "Success"
+
+    if not isinstance(username, str) or not isinstance(password, str):
+        return {"error": True, "message": "invalid values"}, 500
+
+    eliptic_keys.register(username, password)
+    querys.insert_users(cursor, username, password)
+
+    return "Created", 201
 
 
 @app.post("/login")
 def create_user():
+    if not isinstance(request.json, dict):
+        return {"error": True, "message": "invalid json format"}, 500
+
     username = request.json.get("username")
     password = request.json.get("password")
 
-    register = query.select_user(cursor, username, password)
-    if not bool(register):
-        return {"login": False}
+    if not isinstance(username, str) or not isinstance(password, str):
+        return {"error": True, "message": "invalid values"}, 500
 
-    dbPassword = register[0][2]
-    isSamePassword = dbPassword == password
-    isLogin = eliptic.login(username, password)
+    user = querys.select_user(cursor, username)
+    if not user:
+        return {"login": False, "register": False}
 
-    if isLogin and isSamePassword:
-        return {"login": True, "userPassword": password, "dbPassword": dbPassword}
+    isLoginWidthPassword = password != user[0][2]
+    isLoginWidthKeys = eliptic_keys.login(username, password)
 
-    return {"login": False}
+    if isLoginWidthPassword and isLoginWidthKeys:
+        return {"login": False, "register": True}
 
-
-@app.get("/keygen")
-def key_gen():
-    keys_pair = keys.key_gen_RSA()
-    private_key = keys_pair.get("private_key")
-    public_key = keys_pair.get("public_key")
-    return {"private_key": private_key.decode(), "public_key": public_key.decode()}
+    return {"login": True, "register": True}
