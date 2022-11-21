@@ -7,8 +7,7 @@
 2. Mandarse mensajes entre las dos tabs
 3. Ver la magia :3
 ## How works?
-Despues de logear a un usuario y se entra al chat
-Se establece una conexion por medio de WebSockets
-Cuando cualquier usuario envia un mensaje,
-el backend emite un evento en donde envia la lista nueva
-con los mensages nuevos
+1. Despues de logear a un usuario y se entra al chat
+2. Se establece una conexion por medio de WebSockets
+3. Cuando cualquier usuario envia un mensaje,
+el backend emite un evento en donde envia una lista nueva con todos los mensajes a todos sus clientes
