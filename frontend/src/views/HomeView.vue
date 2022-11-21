@@ -1,5 +1,11 @@
+<script setup lang="ts">
+import { useRoute } from 'vue-router'
+
+const route = useRoute()
+console.log(route.params)
+</script>
 <template>
-  <v-card class="ma-auto pa-4" max-width="60%">
+  <v-card class="ma-auto pa-4 rounded" max-width="60%">
     <v-list lines="two">
       <v-list-subheader>Chat</v-list-subheader>
       <v-list-item>
@@ -26,4 +32,3 @@
     />
   </v-card>
 </template>
-<script setup lang="ts"></script>

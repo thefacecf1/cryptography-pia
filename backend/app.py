@@ -1,11 +1,11 @@
-from db import querys
+from db import querys, postgres
 from flask_cors import CORS
 from crypto import eliptic_keys
 from flask import Flask, request
 
 app = Flask(__name__)
 CORS(app)
-cursor = querys.connect_db()
+cursor = postgres.cursor()
 
 
 @app.get("/users")
@@ -29,13 +29,13 @@ def register_user():
         return {"error": True, "message": "user already exists"}, 403
 
     eliptic_keys.register(username, password)
-    querys.insert_users(cursor, username, password)
+    querys.insert_user(cursor, username, password)
 
     return "Created", 201
 
 
 @app.post("/login")
-def create_user():
+def login():
     if not isinstance(request.json, dict):
         return {"error": True, "message": "invalid json format"}, 500
 
@@ -50,10 +50,10 @@ def create_user():
     if not user:
         return {"login": False, "register": False}, 404
 
-    isLoginWidthPassword = password == user[0][2]
-    isLoginWidthKeys = eliptic_keys.login(username, password)
+    isLoginWithPassword = password == user[0][2]
+    isLoginWithKeys = eliptic_keys.login(username, password)
 
-    if not isLoginWidthPassword or not isLoginWidthKeys:
+    if not isLoginWithPassword or not isLoginWithKeys:
         return {"login": False, "register": True}, 401
 
     return {"login": True, "register": True}, 200

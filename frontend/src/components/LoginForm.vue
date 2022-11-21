@@ -42,7 +42,7 @@ const emitPassword = (password: string) => emits('update:password', password)
     />
     <VTextField
       class="mb-2"
-      type="text"
+      type="password"
       variant="outlined"
       placeholder="Password"
       :value="props.password"
