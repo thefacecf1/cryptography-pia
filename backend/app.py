@@ -2,10 +2,17 @@ from flask_cors import CORS
 from db import querys, postgres
 from crypto import eliptic_keys
 from flask import Flask, request
+from flask_socketio import SocketIO
 
 app = Flask(__name__)
-CORS(app)
+sio = SocketIO(app, host="0.0.0.0", cors_allowed_origins="*")
 cursor = postgres.cursor()
+CORS(app)
+
+
+@app.route("/")
+def home():
+    return "Hello world!"
 
 
 @app.post("/login")
@@ -81,5 +88,7 @@ def store_message():
         return {"error": True, "message": "not found user"}, 404
 
     querys.insert_message(cursor, username, message)
+
+    sio.emit("newMessages", {"messages": querys.select_messages(cursor)})
 
     return "Created", 201
