@@ -1,5 +1,6 @@
 import time
 import psycopg2
+import psycopg2.extras
 
 def connect():
     try:
@@ -13,7 +14,7 @@ def cursor():
     for i in range(5):
         connection = connect()
         if connection is not None:
-            return connection.cursor()
+            return connection.cursor(cursor_factory=psycopg2.extras.RealDictCursor)
         print("Retry to connect after 2 sec")
         print("Try number {} of 5".format(i))
         time.sleep(2)

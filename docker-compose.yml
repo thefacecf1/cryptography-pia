@@ -1,25 +1,33 @@
 version: "3.9"
 services:
-  postgres:
-    build: ./db
-    ports:
-      - 5432:5432
-    networks:
-      - new_network
 
   frontend:
     build: ./frontend
     ports:
       - 8080:8080
+    volumes:
+      - ./frontend:/usr/src/app/frontend
 
   backend:
     build: ./backend
     ports:
       - 5000:5000
+    volumes:
+      - ./backend:/usr/src/app/backend
     networks:
       - new_network
     depends_on:
       - postgres
+
+  postgres:
+    build: ./db
+    ports:
+      - 5432:5432
+    volumes:
+      - ./db/data/:/var/lib/postgresql/data/
+      - ./db/tables/:/docker-entrypoint-initdb.d
+    networks:
+      - new_network
 
 networks:
   new_network: 

@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import { ref } from 'vue'
-import { isStatusCode } from '@/utils/typeGuards'
-import { fetchLogin, fetchRegister } from '@/services/login'
+import { isMappedStatusCode } from '@/utils/typeGuards'
+import { fetchLogin, fetchRegister } from '@/services/users'
 import { SNACKBAR_MESSAGES, SNACKBAR_THEMES } from '@/constants'
 
 import LoginForm from '@/components/LoginForm.vue'
@@ -26,20 +26,17 @@ const openSnackbar = (message = 'Default Message', theme = 'Success') => {
 const onLogin = async () => {
   if (form.value && username.value && password.value) {
     const res = await fetchLogin(username.value, password.value)
-    if (isStatusCode(res.status)) {
+    if (isMappedStatusCode(res.status)) {
       openSnackbar(SNACKBAR_MESSAGES[res.status], SNACKBAR_THEMES[res.status])
     }
     if (res.status !== 200) return
-    push({
-      name: 'chat',
-      params: { username: username.value },
-    })
+    push({ name: 'chat', params: { username: username.value } })
   }
 }
 const onRegister = async () => {
   if (form.value && username.value && password.value) {
     const res = await fetchRegister(username.value, password.value)
-    if (!isStatusCode(res.status)) return
+    if (!isMappedStatusCode(res.status)) return
     openSnackbar(SNACKBAR_MESSAGES[res.status], SNACKBAR_THEMES[res.status])
   }
 }

@@ -1,5 +1,5 @@
-from db import querys, postgres
 from flask_cors import CORS
+from db import querys, postgres
 from crypto import eliptic_keys
 from flask import Flask, request
 
@@ -8,13 +8,38 @@ CORS(app)
 cursor = postgres.cursor()
 
 
+@app.post("/login")
+def login():
+    if not isinstance(request.json, dict):
+        return {"error": True, "message": "invalid json format"}, 500
+
+    username = request.json.get("username")
+    password = request.json.get("password")
+
+    if not isinstance(username, str) or not isinstance(password, str):
+        return {"error": True, "message": "invalid values"}, 500
+
+    user = querys.select_user(cursor, username)
+
+    if user is None:
+        return {"login": False, "register": False}, 404
+
+    isLoginWithPassword = password == user.get("password")
+    isLoginWithKeys = eliptic_keys.login(username, password)
+
+    if not isLoginWithPassword or not isLoginWithKeys:
+        return {"login": False, "register": True}, 401
+
+    return {"login": True, "register": True}, 200
+
+
 @app.get("/users")
-def get_user():
+def list_users():
     return {"users": querys.select_users(cursor)}
 
 
-@app.post("/register")
-def register_user():
+@app.post("/users")
+def store_user():
     if not isinstance(request.json, dict):
         return {"error": True, "message": "invalid json format"}, 500
 
@@ -34,26 +59,27 @@ def register_user():
     return "Created", 201
 
 
-@app.post("/login")
-def login():
+@app.get("/messages")
+def list_messages():
+    return {"messages": querys.select_messages(cursor)}
+
+
+@app.post("/messages")
+def store_message():
     if not isinstance(request.json, dict):
         return {"error": True, "message": "invalid json format"}, 500
 
     username = request.json.get("username")
-    password = request.json.get("password")
+    message = request.json.get("message")
 
-    if not isinstance(username, str) or not isinstance(password, str):
+    if not isinstance(username, str) or not isinstance(message, str):
         return {"error": True, "message": "invalid values"}, 500
 
     user = querys.select_user(cursor, username)
 
-    if not user:
-        return {"login": False, "register": False}, 404
+    if user is None:
+        return {"error": True, "message": "not found user"}, 404
 
-    isLoginWithPassword = password == user[0][2]
-    isLoginWithKeys = eliptic_keys.login(username, password)
+    querys.insert_message(cursor, username, message)
 
-    if not isLoginWithPassword or not isLoginWithKeys:
-        return {"login": False, "register": True}, 401
-
-    return {"login": True, "register": True}, 200
+    return "Created", 201

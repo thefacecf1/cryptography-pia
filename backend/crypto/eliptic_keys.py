@@ -1,7 +1,6 @@
 import base64
-from nacl.encoding import HexEncoder
-from nacl.exceptions import BadSignatureError
 from nacl.signing import SigningKey
+from nacl.exceptions import BadSignatureError
 
 def encrypt(data: bytes, password: bytes):
     encrypted_array: list = []
